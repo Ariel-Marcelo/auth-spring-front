@@ -1,0 +1,51 @@
+<div style="max-width: 600px; margin: 40px auto; padding: 25px; border: 1px solid #ddd; border-radius: 8px; font-family: sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">
+    <h2 style="margin: 0; color: #333;">Panel de Administración (Demo)</h2>
+    <button (click)="onLogout()" style="padding: 8px 16px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Cerrar Sesión
+    </button>
+  </div>
+
+  <div style="background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+    <h3 style="margin-top: 0; color: #495057;">Datos de la Sesión (Signals)</h3>
+    <p><strong>Usuario:</strong> {{ auth.username() }}</p>
+    <p><strong>Permisos/Roles:</strong> {{ auth.permissions().join(', ') || 'Ninguno' }}</p>
+    <p><strong>¿Autenticado?:</strong> {{ auth.isAuthenticated() ? 'Sí' : 'No' }}</p>
+  </div>
+
+  <!-- Demo de la Directiva Estructural *appHasPermission -->
+  <div style="border: 1px solid #e9ecef; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+    <h3 style="margin-top: 0; color: #495057;">Control de Componentes con Directiva <code>*appHasPermission</code></h3>
+    
+    <div *appHasPermission="'invoices:read'" style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+      👁️ Este bloque solo es visible porque tienes el permiso: <strong>invoices:read</strong>
+    </div>
+
+    <div *appHasPermission="'invoices:delete'" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+      🗑️ Este botón de borrar solo es visible porque tienes el permiso: <strong>invoices:delete</strong>
+    </div>
+
+    @if (!auth.permissions().includes('invoices:read') && !auth.permissions().includes('invoices:delete')) {
+      <p style="color: #6c757d; font-style: italic;">No tienes permisos específicos de facturas para ver los bloques dinámicos.</p>
+    }
+  </div>
+
+  <!-- Pruebas de Endpoints del Backend -->
+  <div style="border: 1px solid #e9ecef; padding: 15px; border-radius: 6px;">
+    <h3 style="margin-top: 0; color: #495057;">Llamadas a Endpoints Protegidos</h3>
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+      <button (click)="getInvoices()" style="padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        Cargar Facturas (invoices:read)
+      </button>
+      <button (click)="deleteInvoice()" style="padding: 10px 15px; background-color: #ffc107; color: #212529; border: none; border-radius: 4px; cursor: pointer;">
+        Eliminar Factura (invoices:delete)
+      </button>
+    </div>
+
+    @if (invoiceMessage()) {
+      <div style="padding: 10px; background-color: #e2e3e5; border-radius: 4px; font-family: monospace; word-break: break-all;">
+        {{ invoiceMessage() }}
+      </div>
+    }
+  </div>
+</div>
