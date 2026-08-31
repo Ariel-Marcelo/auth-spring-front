@@ -6,14 +6,18 @@ export const authGuard: CanActivateFn = (route, state) => {
   const auth = inject(Auth);
   const router = inject(Router);
 
-  // 1. Obtener el permiso requerido desde la metadata de la ruta (definida en app.routes.ts)
-  const requiredPermission = route.data['permission'] as string;
+  const requiredPermission = route.data['permission'] as string | undefined;
 
-  // 2. Si el usuario está autenticado y tiene el permiso requerido, permitimos el paso
-  if (auth.isAuthenticated() && auth.permissions().includes(requiredPermission)) {
+  // 1. Si no hay permiso requerido explícito en la ruta, solo validamos que esté autenticado
+  if (!requiredPermission && auth.isAuthenticated()) {
     return true;
   }
 
-  // 3. Si no tiene permisos, lo redirigimos a una ruta segura (ej. login o no autorizado)
+  // 2. Si se requiere un permiso específico (ej. 'invoices:read'), validamos que esté en los permisos del token
+  if (auth.isAuthenticated() && requiredPermission && auth.permissions().includes(requiredPermission)) {
+    return true;
+  }
+
+  // 3. Si no está autenticado o no tiene el permiso, bloqueamos y redirigimos
   return router.createUrlTree(['/unauthorized']);
 };
